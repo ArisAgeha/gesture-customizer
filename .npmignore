@@ -2,4 +2,4 @@ yarn.lock
 src/
 .history/
 .babelrc
-.tsconfig
+tsconfig.json
