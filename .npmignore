@@ -1,4 +1,5 @@
-lib/
 yarn.lock
 src/
 .history/
+.babelrc
+.tsconfig
