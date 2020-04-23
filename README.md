@@ -8,7 +8,7 @@ add issues if you need more features :)
 ## Installation
 
 ``` 
-$ npm install gesture-customizer
+npm install gesture-customizer
 ```
 
 OR
