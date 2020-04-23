@@ -5,7 +5,11 @@
     "description": "Help you customize and manage gesture action in web.",
     "license": "MIT",
     "scripts": {
-        "build": "babel ./src/index.ts"
+        "type-check": "tsc --noEmit",
+        "type-check:watch": "npm run type-check -- --watch",
+        "build": "npm run build:types && npm run build:js",
+        "build:types": "tsc --emitDeclarationOnly",
+        "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline"
     },
     "repository": {
         "type": "git",
@@ -24,11 +28,12 @@
     "devDependencies": {
         "@babel/cli": "^7.8.4",
         "@babel/core": "^7.9.0",
+        "@babel/plugin-proposal-class-properties": "^7.8.3",
+        "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
         "@babel/polyfill": "^7.8.7",
         "@babel/preset-env": "^7.9.5",
+        "@babel/preset-typescript": "^7.9.0",
         "typescript": "^3.8.3"
     },
-    "dependencies": {
-        "@babel/preset-typescript": "^7.9.0"
-    }
+    "dependencies": {}
 }
