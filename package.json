@@ -1,12 +1,11 @@
 {
     "name": "gesture-customizer",
     "version": "1.0.0",
-    "main": "dist/index.js",
+    "main": "out/index.js",
     "description": "Help you customize and manage gesture action in web.",
     "license": "MIT",
     "scripts": {
-        "build": "babel src/ --out-dir lib/",
-        "lint": "eslint -c .eslintrc src/"
+        "build": "babel ./src/index.ts"
     },
     "repository": {
         "type": "git",
@@ -21,5 +20,15 @@
     "bugs": {
         "url": "https://github.com/ArisAgeha/gesture-customizer/issues"
     },
-    "homepage": "https://github.com/ArisAgeha/gesture-customizer"
+    "homepage": "https://github.com/ArisAgeha/gesture-customizer",
+    "devDependencies": {
+        "@babel/cli": "^7.8.4",
+        "@babel/core": "^7.9.0",
+        "@babel/polyfill": "^7.8.7",
+        "@babel/preset-env": "^7.9.5",
+        "typescript": "^3.8.3"
+    },
+    "dependencies": {
+        "@babel/preset-typescript": "^7.9.0"
+    }
 }
