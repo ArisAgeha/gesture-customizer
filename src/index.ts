@@ -42,28 +42,6 @@ class GestureFactory {
         this.initListener();
     }
 
-    registry(keyType: KeyType, gestureAction: GestureAction[], callback: GestureHandler): void {
-        const identifier = this.getIdentifier(keyType);
-        this.saveGestureHandler(identifier, gestureAction, callback);
-    }
-
-    remove(keyType: KeyType, callback: GestureHandler) {
-        const identifier = this.getIdentifier(keyType);
-        const targetStore = this.gestureList[identifier];
-        if (isArray(targetStore)) {
-            const targetIndex = targetStore.findIndex((handlerStore) => handlerStore.gestureHandler === callback);
-            if (targetIndex !== -1) targetStore.splice(targetIndex, 1);
-        }
-    }
-
-    pause() {
-        this.isPause = true;
-    }
-
-    resume() {
-        this.isPause = false;
-    }
-
     private initListener() {
         window.addEventListener('mousedown', (downEvent: MouseEvent) => {
             if (this.isPause) return;
@@ -83,12 +61,13 @@ class GestureFactory {
 
             const onMove = (moveEvent: MouseEvent) => {
                 moveSlice.x += moveEvent.movementX;
-                moveSlice.y += moveEvent.movementY;
+                moveSlice.y -= moveEvent.movementY;
 
-                if (moveSlice.x > this.MIN_DETECT_DISTANCE || moveSlice.y > this.MIN_DETECT_DISTANCE) {
+                if (Math.abs(moveSlice.x) > this.MIN_DETECT_DISTANCE || Math.abs(moveSlice.y) > this.MIN_DETECT_DISTANCE) {
                     const direction = this.getDirection(moveSlice.x, moveSlice.y);
                     const latestMoveStep = moveStep[moveStep.length - 1];
-                    if (moveStep.length > 0 && latestMoveStep.direction === direction) {
+
+                    if (moveStep.length > 0 && latestMoveStep?.direction === direction) {
                         latestMoveStep.deltaX += moveSlice.x;
                         latestMoveStep.deltaY += moveSlice.y;
                         latestMoveStep.spendTime = Number(Date.now()) - timer;
@@ -140,8 +119,8 @@ class GestureFactory {
             if (maxSpendTime && maxSpendTime < realAction.spendTime) return;
 
             const realDistance = realAction.direction.length === 1
-                ? Math.max(realAction.deltaX, realAction.deltaY)
-                : Math.sqrt(realAction.deltaX ** 2 + realAction.deltaY ** 2);
+                ? Math.max(Math.abs(realAction.deltaX), Math.abs(realAction.deltaY))
+                : Math.sqrt(Math.abs(realAction.deltaX) ** 2 + Math.abs(realAction.deltaY) ** 2);
 
             if (maxDistance && maxDistance < realDistance) return;
 
@@ -152,28 +131,50 @@ class GestureFactory {
         }
     }
 
+    registry(keyType: KeyType, gestureAction: GestureAction[], callback: GestureHandler): void {
+        const identifier = this.getIdentifier(keyType);
+        this.saveGestureHandler(identifier, gestureAction, callback);
+    }
+
+    remove(keyType: KeyType, callback: GestureHandler) {
+        const identifier = this.getIdentifier(keyType);
+        const targetStore = this.gestureList[identifier];
+        if (isArray(targetStore)) {
+            const targetIndex = targetStore.findIndex((handlerStore) => handlerStore.gestureHandler === callback);
+            if (targetIndex !== -1) targetStore.splice(targetIndex, 1);
+        }
+    }
+
+    pause() {
+        this.isPause = true;
+    }
+
+    resume() {
+        this.isPause = false;
+    }
+
     private getDirection(x: number, y: number): Direction {
         let direction: Direction = 'T';
-        const tanh225 = Math.tanh(22.5);
-        const tanh675 = Math.tanh(67.5);
+        const tan225 = Math.tan(Math.PI / 180 * 22.5); // 0.41
+        const tan675 = Math.tan(Math.PI / 180 * 67.5); // 2.4
         if (x === 0) return y > 0 ? 'T' : 'B';
         if (y === 0) return x > 0 ? 'R' : 'L';
 
         const res = y / x;
 
         if (y > 0) {
-            if (res > tanh675) direction = 'T';
-            else if (tanh675 > res && res > tanh225) direction = 'TR';
-            else if (tanh225 > res && res > -tanh225) direction = 'R';
-            else if (-tanh225 > res && res > -tanh675) direction = 'RB';
-            else direction = 'B';
+            if (res > 0 && res < tan225) direction = 'R';
+            else if (res > tan225 && res < tan675) direction = 'TR';
+            else if (res > tan675 || res < -tan675) direction = 'T';
+            else if (res > -tan675 && res < -tan225) direction = 'LT';
+            else direction = 'L';
         }
         else {
-            if (res > tanh675) direction = 'B';
-            else if (tanh675 > res && res > tanh225) direction = 'BL';
-            else if (tanh225 > res && res > -tanh225) direction = 'L';
-            else if (-tanh225 > res && res > -tanh675) direction = 'LT';
-            else direction = 'T';
+            if (res > 0 && res < tan225) direction = 'L';
+            else if (res > tan225 && res < tan675) direction = 'BL';
+            else if (res > tan675 || res < -tan675) direction = 'B';
+            else if (res > -tan675 && res < -tan225) direction = 'RB';
+            else direction = 'R';
         }
 
         return direction;
