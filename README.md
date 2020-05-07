@@ -1,3 +1,7 @@
+## demo
+
+[CodeSandBox](https://codesandbox.io/s/wizardly-lake-wj8v4?file=/src/App.vue)
+
 ## Note
 
 Help you customize and manage gesture action in web. 

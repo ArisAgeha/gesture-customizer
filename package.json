@@ -1,6 +1,6 @@
 {
     "name": "gesture-customizer",
-    "version": "1.0.10",
+    "version": "1.0.12",
     "main": "lib/index.js",
     "description": "Help you customize and manage gesture action in web.",
     "license": "MIT",
